@@ -979,6 +979,11 @@ class Seq2Seq(d2l.EncoderDecoder):
         # Adam optimizer is used here
         return tf.keras.optimizers.Adam(learning_rate=self.lr)
 
+    def loss(self, Y_hat, Y):
+        l = super(Seq2Seq, self).loss(Y_hat, Y, averaged=False)
+        mask = tf.cast(tf.reshape(Y, -1) != self.tgt_pad, tf.float32)
+        return tf.reduce_sum(l * mask) / tf.reduce_sum(mask)
+
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
 

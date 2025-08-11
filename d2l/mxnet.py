@@ -1025,6 +1025,11 @@ class Seq2Seq(d2l.EncoderDecoder):
         # Adam optimizer is used here
         return gluon.Trainer(self.parameters(), 'adam',
                              {'learning_rate': self.lr})
+    
+    def loss(self, Y_hat, Y):
+        l = super(Seq2Seq, self).loss(Y_hat, Y, averaged=False)
+        mask = (Y.reshape(-1) != self.tgt_pad).astype(np.float32)
+        return (l * mask).sum() / mask.sum()
 
 def bleu(pred_seq, label_seq, k):
     """Compute the BLEU.
